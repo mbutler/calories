@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f5f0">
+  <meta name="description" content="A simpler place to keep track of what you eat.">
+  <title>Calories · Your daily journal</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/style.css?v=barcode-scan-2">
+  <script type="module" src="./assets/app.js?v=barcode-scan-2"></script>
+</head>
+<body>
+  <div id="notice" class="notice" role="status" hidden></div>
+  <section id="login-screen" class="login-screen" hidden>
+    <form id="login-form" class="login-card">
+      <span class="brand-mark" aria-hidden="true">c.</span>
+      <p class="eyebrow">YOUR DAILY JOURNAL</p>
+      <h1>Welcome back.</h1>
+      <p class="muted">A little attention. A clearer picture.</p>
+      <label>App password<input name="password" type="password" autocomplete="current-password" required></label>
+      <p class="form-error" role="alert"></p>
+      <button class="button primary" type="submit">Sign in</button>
+    </form>
+  </section>
+  <div id="app" class="shell" hidden>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Calories home"><span class="brand-mark" aria-hidden="true">c.</span>calories<span class="brand-dot"> / </span><span class="brand-sub">keep it simple</span></a>
+      <button class="button quiet" id="targets-button">Daily targets <span aria-hidden="true">↗</span></button>
+    </header>
+    <nav class="tabs" aria-label="Main navigation">
+      <button id="journal-tab" class="tab active" aria-current="page">Journal</button>
+      <button id="foods-tab" class="tab">My foods</button>
+    </nav>
+    <main>
+      <section id="journal-view" aria-labelledby="journal-title">
+        <div class="page-heading">
+          <div><p class="eyebrow" id="date-caption">YOUR DAILY JOURNAL</p><h1 id="journal-title">One day at a time.</h1></div>
+          <div class="date-picker"><button class="icon-button" id="previous-day" aria-label="Previous day">←</button><input type="date" id="log-date" aria-label="Journal date" min="1000-01-01" max="9999-12-31"><button class="icon-button" id="next-day" aria-label="Next day">→</button></div>
+        </div>
+        <div id="journal-error" class="error-banner" role="alert" hidden></div>
+        <div class="dashboard-grid">
+          <section class="card energy-card" aria-labelledby="energy-title">
+            <div class="card-heading"><h2 id="energy-title">Daily energy</h2><span class="small-tag">KCAL</span></div>
+            <div class="energy-ring">
+              <svg viewBox="0 0 220 220" aria-hidden="true"><circle class="ring-track" cx="110" cy="110" r="94"/><circle id="energy-progress" class="ring-fill" cx="110" cy="110" r="94" pathLength="100" stroke-dasharray="0 100"/></svg>
+              <div class="energy-number"><strong id="calories-total">—</strong><span id="calories-goal">Loading your day</span></div>
+            </div>
+            <p id="calories-remaining" class="remaining">A fresh start, every day.</p>
+          </section>
+          <section class="card macro-card" aria-labelledby="macro-title">
+            <div class="card-heading"><h2 id="macro-title">The big three</h2><span class="muted small">GRAMS</span></div>
+            <div class="macro protein"><div><h3><span class="macro-dot"></span>Protein</h3><p><strong id="protein-total">—</strong><span id="protein-goal"></span></p></div><progress id="protein-progress" max="100" value="0" aria-label="Protein target progress"></progress></div>
+            <div class="macro carbs"><div><h3><span class="macro-dot"></span>Carbs</h3><p><strong id="carbs-total">—</strong><span id="carbs-goal"></span></p></div><progress id="carbs-progress" max="100" value="0" aria-label="Carbohydrate target progress"></progress></div>
+            <div class="macro fat"><div><h3><span class="macro-dot"></span>Fat</h3><p><strong id="fat-total">—</strong><span id="fat-goal"></span></p></div><progress id="fat-progress" max="100" value="0" aria-label="Fat target progress"></progress></div>
+            <p class="macro-note">Your numbers, at a glance.</p>
+          </section>
+        </div>
+        <section class="journal-section" aria-labelledby="entries-title">
+          <div class="section-heading"><div><h2 id="entries-title">On the menu <span id="entry-count" class="count">0</span></h2><p class="muted">Everything you’ve logged for this day.</p></div><button id="add-food" class="button primary"><span aria-hidden="true">＋</span> Add food</button></div>
+          <div id="entries" class="card entries-card" aria-live="polite"><div class="empty-state"><p>Loading your journal…</p></div></div>
+        </section>
+      </section>
+      <section id="foods-view" aria-labelledby="foods-title" hidden>
+        <div class="page-heading"><div><p class="eyebrow">A LITTLE LESS REPETITION</p><h1 id="foods-title">Your everyday foods.</h1><p class="muted">Save it once. Find it here next time.</p></div><button id="create-food" class="button primary">＋ Create food</button></div>
+        <button id="scan-food" class="button scan-button">▥ Scan or enter a barcode</button>
+        <div class="search-box"><span aria-hidden="true">⌕</span><input id="food-search" type="search" placeholder="Search your foods…" aria-label="Search your foods" maxlength="160" autocomplete="off"></div>
+        <div class="library-caption"><span id="food-list-caption">RECENTLY USED & ADDED</span><span id="logging-date"></span></div>
+        <div id="food-results" class="card food-results" aria-live="polite"></div>
+      </section>
+    </main>
+    <footer><span>Small steps. A clearer picture.</span><button id="today-button" class="text-button">Back to today</button><button id="logout-button" class="text-button">Sign out</button></footer>
+  </div>
+
+  <dialog id="food-dialog" aria-labelledby="food-dialog-title">
+    <form id="food-form">
+      <div class="dialog-heading"><div><p class="eyebrow">YOUR FOOD LIBRARY</p><h2 id="food-dialog-title">Create a food</h2></div><button type="button" class="icon-button" data-close aria-label="Close">×</button></div>
+      <p class="muted">Use the nutrition label or a verified food source. Include details like raw or cooked in the name.</p>
+      <p id="barcode-review-note" class="hint" hidden></p>
+      <label>Food name<input name="name" placeholder="e.g. Greek yogurt, plain" required maxlength="160" autocomplete="off"></label>
+      <label>Barcode <span>(optional)</span><input name="barcode" type="text" inputmode="numeric" maxlength="32" autocomplete="off" placeholder="Digits printed below the barcode"></label>
+      <div class="form-grid"><label>Nutrition per<input name="basis_amount" type="number" value="100" min="0.001" max="1000000" step="0.001" required inputmode="decimal"></label><label>Unit<select name="basis_unit" required><option value="">Choose the label’s unit</option><option value="g" selected>grams (g)</option><option value="ml">milliliters (ml)</option><option value="serving">servings</option></select></label></div>
+      <div class="form-grid nutrient-fields"><label>Calories <span>kcal</span><input name="calories" type="number" min="0" max="1000000" step="0.001" required inputmode="decimal"></label><label>Protein <span>g</span><input name="protein" type="number" min="0" max="1000000" step="0.001" required inputmode="decimal"></label><label>Carbs <span>g</span><input name="carbs" type="number" min="0" max="1000000" step="0.001" required inputmode="decimal"></label><label>Fat <span>g</span><input name="fat" type="number" min="0" max="1000000" step="0.001" required inputmode="decimal"></label></div>
+      <p id="food-edit-note" class="hint" hidden>Changes apply to future logs. Your past entries keep their original nutrition.</p>
+      <p class="form-error" role="alert"></p><button type="submit" class="button primary full-width">Save food</button>
+    </form>
+  </dialog>
+  <dialog id="scanner-dialog" aria-labelledby="scanner-title">
+    <form id="scanner-form">
+      <div class="dialog-heading"><div><p class="eyebrow">FROM PACKAGE TO JOURNAL</p><h2 id="scanner-title">Find a packaged food</h2></div><button type="button" class="icon-button" data-close aria-label="Close">×</button></div>
+      <p class="muted">Scan a UPC or EAN barcode, or type the digits below. You’ll review the food before logging it.</p>
+      <div id="barcode-camera"></div>
+      <div class="camera-actions"><button id="start-camera" type="button" class="button">Start camera</button><button id="stop-camera" type="button" class="button" hidden>Stop camera</button></div>
+      <p id="camera-status" class="hint" role="status"></p>
+      <label id="camera-select-label" hidden>Camera<select id="camera-select"></select></label>
+      <label>Product barcode<input name="barcode" type="text" inputmode="numeric" autocomplete="off" maxlength="32" required placeholder="e.g. 012345678905"></label>
+      <p class="form-error" role="alert"></p>
+      <button type="submit" class="button primary full-width">Look up food</button>
+      <button id="manual-barcode" type="button" class="text-button">Enter label manually</button>
+      <p class="hint">Product data from <a href="https://world.openfoodfacts.org/" target="_blank" rel="noopener noreferrer">Open Food Facts</a>, under the <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener noreferrer">Open Database License</a>. Camera images stay on your device.</p>
+    </form>
+  </dialog>
+  <dialog id="quantity-dialog" aria-labelledby="quantity-title">
+    <form id="quantity-form">
+      <div class="dialog-heading"><div><p class="eyebrow" id="quantity-caption">ADD TO YOUR DAY</p><h2 id="quantity-title"></h2></div><button type="button" class="icon-button" data-close aria-label="Close">×</button></div>
+      <p id="quantity-basis" class="muted"></p>
+      <label id="quantity-label">Amount <span id="quantity-unit"></span><input name="quantity" type="number" min="0.001" max="1000000" step="0.001" required inputmode="decimal"></label>
+      <div id="quantity-preview" class="quantity-preview" aria-live="polite"></div>
+      <p class="form-error" role="alert"></p>
+      <div class="dialog-actions"><button id="delete-entry" type="button" class="button danger" hidden>Delete entry</button><button id="quantity-submit" type="submit" class="button primary">Add to journal</button></div>
+    </form>
+  </dialog>
+  <dialog id="targets-dialog" aria-labelledby="targets-title">
+    <form id="targets-form">
+      <div class="dialog-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h2 id="targets-title">Daily targets</h2></div><button type="button" class="icon-button" data-close aria-label="Close">×</button></div>
+      <p class="muted">Set your own goals. Leave a target at zero to track that number without a goal.</p>
+      <div class="form-grid nutrient-fields"><label>Calories <span>kcal</span><input name="calories" type="number" min="0" max="1000000" step="0.001" required inputmode="decimal"></label><label>Protein <span>g</span><input name="protein" type="number" min="0" max="1000000" step="0.001" required inputmode="decimal"></label><label>Carbs <span>g</span><input name="carbs" type="number" min="0" max="1000000" step="0.001" required inputmode="decimal"></label><label>Fat <span>g</span><input name="fat" type="number" min="0" max="1000000" step="0.001" required inputmode="decimal"></label></div>
+      <p class="form-error" role="alert"></p><button type="submit" class="button primary full-width">Save targets</button>
+    </form>
+  </dialog>
+  <noscript>This journal needs JavaScript enabled to load and save your food entries.</noscript>
+</body>
+</html>

@@ -1,0 +1,14 @@
+/public/private/config.php
+/public/private/config.php.*
+/public/private/config.php~
+/public/private/.config.php.swp
+/public/private/.config.php.swo
+/config/local.php
+/config/local.php.*
+/.env
+/.env.*
+!/.env.example
+/public/assets/
+/node_modules/
+.DS_Store
+/var/

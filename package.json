@@ -1,0 +1,13 @@
+{
+  "name": "calories",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun build frontend/app.js --outdir public/assets --minify && bun build frontend/style.css --outdir public/assets --minify && cp node_modules/html5-qrcode/LICENSE public/assets/html5-qrcode.LICENSE.txt",
+    "dev": "bun run build && php -S 127.0.0.1:8080 -t public router.php",
+    "test": "php tests/domain.php && php tests/barcodes.php && bun test tests"
+  },
+  "dependencies": {
+    "html5-qrcode": "2.3.8"
+  }
+}
